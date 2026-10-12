@@ -1,0 +1,487 @@
+/* assets/css/style-tamu.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    /* ==========================================================
+       TEMPAT MENGUBAH BACKGROUND FOTO KANTOR
+       1. Pastikan foto Anda ada di folder assets/images/
+       2. Ganti 'bg-kantor.jpg' dengan nama file foto Anda jika berbeda.
+       3. rgba(0,0,0, 0.35) adalah efek gelap transparan agar card tetap menonjol.
+       ========================================================== */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('../images/kantor.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw;
+    color: #334155;
+    position: relative;
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+
+/* --- ANIMASI IKON --- */
+
+@keyframes floatIcon {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+
+/* --- HALAMAN AWAL (WELCOME PAGE) --- */
+
+.welcome-container {
+    background-color: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(12px);
+    width: 100%;
+    max-width: 520px;
+    padding: 45px 35px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.welcome-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+}
+
+.icon-wrapper {
+    margin-bottom: 16px;
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1E3A8A;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 15px;
+    color: #64748B;
+    margin-bottom: 30px;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 15px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 280px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.instruction-text {
+    font-size: 13px;
+    color: #94A3B8;
+    margin-top: 12px;
+    margin-bottom: 30px;
+}
+
+.security-info {
+    display: flex;
+    align-items: flex-start;
+    background-color: rgba(240, 249, 255, 0.9);
+    border: 1px solid rgba(186, 230, 253, 0.8);
+    padding: 16px 18px;
+    border-radius: 14px;
+    text-align: left;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.security-info:hover {
+    background-color: rgba(224, 242, 254, 1);
+}
+
+.security-icon {
+    margin-right: 14px;
+    padding-top: 2px;
+    flex-shrink: 0;
+}
+
+.security-text strong {
+    display: block;
+    font-size: 13px;
+    color: #0369A1;
+    margin-bottom: 3px;
+}
+
+.security-text p {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.5;
+}
+
+
+/* --- HALAMAN FORM (form.php) --- */
+
+.form-body {
+    align-items: flex-start;
+    padding: 30px 15px;
+}
+
+.form-wrapper {
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    width: 100%;
+    max-width: 850px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    margin: 0 auto;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed rgba(226, 232, 240, 0.8);
+    padding-bottom: 18px;
+    margin-bottom: 25px;
+}
+
+.logo-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1E3A8A;
+}
+
+.logo-title h2 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.btn-back {
+    text-decoration: none;
+    color: #64748B;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid #E2E8F0;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    background-color: #F8FAFC;
+    color: #0F172A;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.section-title {
+    font-size: 13px;
+    color: #3B82F6;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #CBD5E1;
+    background-color: rgba(248, 250, 252, 0.9);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #60A5FA;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+
+/* ==========================================================
+   KAMERA
+   ========================================================== */
+
+.camera-container {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: rgba(241, 245, 249, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 2px dashed #94A3B8;
+    margin-bottom: 16px;
+
+    /* Pastikan container tidak dibalik */
+    transform: none !important;
+    -webkit-transform: none !important;
+}
+
+.camera-container video,
+.camera-container canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    /* PENTING:
+       Jangan membalik kamera secara horizontal */
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -o-transform: none !important;
+
+    /* Pastikan arah normal */
+    direction: ltr !important;
+}
+
+/* Pastikan video kamera benar-benar tidak mirror */
+.camera-container video {
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -o-transform: none !important;
+
+    direction: ltr !important;
+}
+
+/* Pastikan hasil foto canvas juga tidak mirror */
+.camera-container canvas {
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -o-transform: none !important;
+
+    direction: ltr !important;
+}
+
+
+/* --- TOMBOL KAMERA --- */
+
+.camera-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-outline {
+    flex: 1;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    color: #475569;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+    background: #F1F5F9;
+    border-color: #94A3B8;
+}
+
+.form-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed rgba(226, 232, 240, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.tips-box {
+    background-color: rgba(236, 253, 245, 0.9);
+    color: #065F46;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid rgba(167, 243, 208, 0.8);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 350px;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(16, 185, 129, 0.4);
+}
+
+
+/* --- TOMBOL ADMIN & HALAMAN LOGIN --- */
+
+.btn-admin-login {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #FDBA74 0%, #F97316 100%);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.btn-admin-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(249, 115, 22, 0.5);
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(12px);
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    text-align: left;
+    margin: 20px;
+}
+
+.login-container h2 {
+    text-align: center;
+    color: #1E3A8A;
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.alert-error {
+    background-color: rgba(254, 242, 242, 0.9);
+    color: #991B1B;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(254, 202, 202, 0.8);
+    text-align: center;
+    font-weight: 500;
+}
+
+
+/* --- RESPONSIVITAS UNTUK HP (MOBILE) --- */
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 15px;
+        align-items: center;
+        background-attachment: scroll;
+    }
+
+    .welcome-container {
+        padding: 30px 20px;
+        max-width: 100%;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+
+    .btn-admin-login {
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .form-wrapper {
+        padding: 20px;
+    }
+}
