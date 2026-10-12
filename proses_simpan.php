@@ -15,9 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 3. Tangkap data teks dari form
     $nama_lengkap   = $conn->real_escape_string($_POST['nama_lengkap']);
     $instansi       = $conn->real_escape_string($_POST['instansi']);
+    $alamat         = $conn->real_escape_string($_POST['alamat']); // KOLOM ALAMAT BARU
     $no_telepon     = $conn->real_escape_string($_POST['no_telepon']);
-    
-    // MENANGKAP VARIABEL BARU: Kategori dan Keperluan
     $kategori       = $conn->real_escape_string($_POST['kategori']); 
     $keperluan      = $conn->real_escape_string($_POST['keperluan']);
     $bertemu_dengan = $conn->real_escape_string($_POST['bertemu_dengan']);
@@ -41,9 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 9. Ambil Waktu Real-Time Saat Ini secara spesifik
     $waktu_database = date('Y-m-d H:i:s'); 
 
-    // 10. Simpan data ke Database menggunakan Prepared Statement (Termasuk kolom Kategori)
-    $stmt = $conn->prepare("INSERT INTO kunjungan (waktu_masuk, nama_lengkap, instansi, no_telepon, kategori, keperluan, bertemu_dengan, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss", $waktu_database, $nama_lengkap, $instansi, $no_telepon, $kategori, $keperluan, $bertemu_dengan, $nama_file_foto);
+    // 10. Simpan data ke Database menggunakan Prepared Statement (Sesuai dengan kolom DB)
+    $stmt = $conn->prepare("INSERT INTO kunjungan (waktu_masuk, nama_lengkap, instansi, alamat, no_telepon, kategori, keperluan, bertemu_dengan, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssss", $waktu_database, $nama_lengkap, $instansi, $alamat, $no_telepon, $kategori, $keperluan, $bertemu_dengan, $nama_file_foto);
 
     // 11. Eksekusi query
     if ($stmt->execute()) {
@@ -72,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ==========================================
         // KIRIM PESAN OTOMATIS VIA FONNTE API
         // ==========================================
-        $token_fonnte = 'hYJytUKE8ixvymnDzm9A'; 
+        $token_fonnte = 'Nm54Nt1seRQkENXw76pP'; 
 
         $pesan_wa = "Halo, Yth. *Bapak/Ibu {$nama_lengkap}* 👋\n\n" .
                     "Kami mengucapkan terima kasih atas kunjungan Anda ke kantor *Balai Kekarantinaan Kesehatan (BKK) Kelas I Banjarmasin* pada hari ini.\n\n" .
@@ -81,6 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     "----------------------------------------------------\n" .
                     "👤 *Nama Lengkap*   : {$nama_lengkap}\n" .
                     "🏢 *Instansi/Asal*      : {$instansi}\n" .
+                    "📍 *Alamat*                : {$alamat}\n" .
                     "📞 *No. WhatsApp* : {$no_telepon}\n" .
                     "📌 *Kategori*              : {$kategori}\n" . 
                     "🎯 *Rincian Keperluan* : {$keperluan}\n" . 

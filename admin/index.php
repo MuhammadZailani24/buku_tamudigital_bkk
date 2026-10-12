@@ -53,6 +53,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'stats') {
             $waktu = !empty($row['waktu_masuk']) ? date('d/m/Y H:i', strtotime($row['waktu_masuk'])) : '-';
             $nama = htmlspecialchars($row['nama_lengkap'] ?? '', ENT_QUOTES, 'UTF-8');
             $instansi = htmlspecialchars($row['instansi'] ?? '', ENT_QUOTES, 'UTF-8');
+            $alamat = htmlspecialchars($row['alamat'] ?? '-', ENT_QUOTES, 'UTF-8');
             $kategori = !empty($row['kategori']) ? htmlspecialchars($row['kategori'], ENT_QUOTES, 'UTF-8') : 'Umum / Lainnya';
             $keperluan = htmlspecialchars($row['keperluan'] ?? '', ENT_QUOTES, 'UTF-8');
             $bertemu = htmlspecialchars($row['bertemu_dengan'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -62,6 +63,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'stats') {
             $html .= '<td style="vertical-align: middle;">' . $waktu . '</td>';
             $html .= '<td style="vertical-align: middle;"><strong>' . $nama . '</strong></td>';
             $html .= '<td style="vertical-align: middle;">' . $instansi . '</td>';
+            $html .= '<td style="vertical-align: middle;">' . $alamat . '</td>';
             
             // Kolom Kategori (Label Hijau)
             $html .= '<td style="vertical-align: middle;"><span style="background: #F0FDF4; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 11.5px; border: 1px solid #BBF7D0; display: inline-block; font-weight: bold;">' . $kategori . '</span></td>';
@@ -83,7 +85,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'stats') {
             $html .= '</tr>';
         }
     } else {
-        $html = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Belum ada data kunjungan terbaru.</td></tr>';
+        $html = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Belum ada data kunjungan terbaru.</td></tr>';
     }
 
     echo json_encode([
@@ -100,7 +102,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'stats') {
 
 // ==========================================================
 // QUERY STATISTIK UNTUK LOAD PERTAMA (Tanpa AJAX)
-// ==========================================
+// ==========================================================
 
 $q_hari = $conn->query("SELECT COUNT(id_kunjungan) AS total FROM kunjungan WHERE DATE(waktu_masuk) = CURDATE()");
 $hari_ini = $q_hari ? $q_hari->fetch_assoc()['total'] : 0;
@@ -157,13 +159,14 @@ include 'includes/header.php';
             <table>
                 <thead>
                     <tr>
-                        <th width="12%">Waktu</th>
-                        <th width="16%">Nama</th>
-                        <th width="14%">Instansi</th>
-                        <th width="16%">Kategori</th>
-                        <th width="18%">Keperluan</th>
+                        <th width="10%">Waktu</th>
+                        <th width="14%">Nama</th>
+                        <th width="12%">Asal</th>
+                        <th width="14%">Alamat</th>
+                        <th width="13%">Kategori</th>
+                        <th width="15%">Keperluan</th>
                         <th width="14%">Bertemu</th>
-                        <th width="10%" style="text-align: center;">Foto</th>
+                        <th width="8%" style="text-align: center;">Foto</th>
                     </tr>
                 </thead>
                 <tbody id="tabelTerbaruBody">
@@ -173,6 +176,7 @@ include 'includes/header.php';
                             $waktu = !empty($row['waktu_masuk']) ? date('d/m/Y H:i', strtotime($row['waktu_masuk'])) : '-';
                             $nama = htmlspecialchars($row['nama_lengkap'] ?? '', ENT_QUOTES, 'UTF-8');
                             $instansi = htmlspecialchars($row['instansi'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $alamat = htmlspecialchars($row['alamat'] ?? '-', ENT_QUOTES, 'UTF-8');
                             $kategori = !empty($row['kategori']) ? htmlspecialchars($row['kategori'], ENT_QUOTES, 'UTF-8') : 'Umum / Lainnya';
                             $keperluan = htmlspecialchars($row['keperluan'] ?? '', ENT_QUOTES, 'UTF-8');
                             $bertemu = htmlspecialchars($row['bertemu_dengan'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -182,6 +186,7 @@ include 'includes/header.php';
                                 <td style="vertical-align: middle;"><?= $waktu; ?></td>
                                 <td style="vertical-align: middle;"><strong><?= $nama; ?></strong></td>
                                 <td style="vertical-align: middle;"><?= $instansi; ?></td>
+                                <td style="vertical-align: middle;"><?= $alamat; ?></td>
                                 
                                 <td style="vertical-align: middle;">
                                     <span style="background: #F0FDF4; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 11.5px; border: 1px solid #BBF7D0; display: inline-block; font-weight: bold;">
@@ -207,7 +212,7 @@ include 'includes/header.php';
                     } else {
                     ?>
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 20px;">Belum ada data kunjungan terbaru.</td>
+                            <td colspan="8" style="text-align: center; padding: 20px;">Belum ada data kunjungan terbaru.</td>
                         </tr>
                     <?php
                     }

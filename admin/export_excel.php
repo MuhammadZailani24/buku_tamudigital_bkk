@@ -1,11 +1,8 @@
 <?php
 // admin/export_excel.php
 
-// Sinkronisasi Zona Waktu
 date_default_timezone_set('Asia/Makassar');
 require_once '../config/database.php';
-
-// PANGGIL LIBRARY PHPSPREADSHEET
 require_once '../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -15,13 +12,11 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-// Menangkap parameter filter
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'harian';
 $where_clause = "1=1"; 
 $periode = "Semua Data";
-$nama_file = "Rekap_Tamu_Semua.xlsx"; // Ganti format menjadi XLSX murni
+$nama_file = "Rekap_Tamu_Semua.xlsx";
 
-// Logika Filter
 switch ($filter) {
     case 'harian':
         $tgl = isset($_GET['tgl_harian']) ? $conn->real_escape_string($_GET['tgl_harian']) : date('Y-m-d');
@@ -55,40 +50,34 @@ switch ($filter) {
         break;
 }
 
-// Eksekusi Query Database
 $query = "SELECT * FROM kunjungan WHERE $where_clause ORDER BY waktu_masuk DESC";
 $result = $conn->query($query);
 
-// Inisialisasi Spreadsheet
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle('Data Kunjungan');
 
-// ==========================================
-// PENGATURAN LEBAR KOLOM
-// ==========================================
 $sheet->getColumnDimension('A')->setWidth(5);
-$sheet->getColumnDimension('B')->setWidth(22);
-$sheet->getColumnDimension('C')->setWidth(35);
-$sheet->getColumnDimension('D')->setWidth(30);
-$sheet->getColumnDimension('E')->setWidth(18);
-$sheet->getColumnDimension('F')->setWidth(40);
-$sheet->getColumnDimension('G')->setWidth(25);
+$sheet->getColumnDimension('B')->setWidth(20);
+$sheet->getColumnDimension('C')->setWidth(25);
+$sheet->getColumnDimension('D')->setWidth(25);
+$sheet->getColumnDimension('E')->setWidth(30); 
+$sheet->getColumnDimension('F')->setWidth(18); 
+$sheet->getColumnDimension('G')->setWidth(25); 
+$sheet->getColumnDimension('H')->setWidth(35); 
+$sheet->getColumnDimension('I')->setWidth(20); 
+$sheet->getColumnDimension('J')->setWidth(15); 
 
-// ==========================================
-// MEMBUAT KOP SURAT
-// ==========================================
-$sheet->mergeCells('A1:G1');
-$sheet->mergeCells('A2:G2');
-$sheet->mergeCells('A3:G3');
-$sheet->mergeCells('A4:G4');
+$sheet->mergeCells('A1:J1');
+$sheet->mergeCells('A2:J2');
+$sheet->mergeCells('A3:J3');
+$sheet->mergeCells('A4:J4');
 
 $sheet->setCellValue('A1', 'KEMENTERIAN KESEHATAN REPUBLIK INDONESIA');
 $sheet->setCellValue('A2', 'BALAI KEKARANTINAAN KESEHATAN KELAS I BANJARMASIN');
 $sheet->setCellValue('A3', 'Jl. Belitung Darat No.118A, Belitung Selatan, Kec. Banjarmasin Barat, Kalimantan Selatan');
 $sheet->setCellValue('A4', 'Telepon: (0511) 3353948 | Email: balaikarkesbanjarmasin@kemkes.go.id');
 
-// Style Kop Surat (Rata Tengah, Font Times New Roman)
 $styleKop = [
     'alignment' => [
         'horizontal' => Alignment::HORIZONTAL_CENTER,
@@ -96,24 +85,18 @@ $styleKop = [
     ],
     'font' => ['name' => 'Times New Roman']
 ];
-$sheet->getStyle('A1:G4')->applyFromArray($styleKop);
+$sheet->getStyle('A1:J4')->applyFromArray($styleKop);
 $sheet->getStyle('A1')->getFont()->setSize(13);
 $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(16);
-$sheet->getStyle('A3:G4')->getFont()->setSize(11);
+$sheet->getStyle('A3:J4')->getFont()->setSize(11);
 
-// Garis Bawah Kop Surat
-$sheet->getStyle('A4:G4')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_DOUBLE);
+$sheet->getStyle('A4:J4')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_DOUBLE);
 
-// Tinggi Baris Kop agar logo pas
 $sheet->getRowDimension(1)->setRowHeight(20);
 $sheet->getRowDimension(2)->setRowHeight(25);
 $sheet->getRowDimension(3)->setRowHeight(15);
 $sheet->getRowDimension(4)->setRowHeight(25);
 
-// ==========================================
-// MEMASUKKAN GAMBAR LOGO KE EXCEL
-// ==========================================
-// 1. Logo Kiri (Kemenkes)
 if (file_exists('../assets/images/logo_bkk.webp')) {
     $logoKiri = new Drawing();
     $logoKiri->setName('Logo Kemenkes');
@@ -125,41 +108,37 @@ if (file_exists('../assets/images/logo_bkk.webp')) {
     $logoKiri->setWorksheet($sheet);
 }
 
-// 2. Logo Kanan (Karantina)
 if (file_exists('../assets/images/karantina.webp')) {
     $logoKanan = new Drawing();
     $logoKanan->setName('Logo Karantina');
     $logoKanan->setPath('../assets/images/karantina.webp');
-    $logoKanan->setCoordinates('G1');
+    $logoKanan->setCoordinates('J1');
     $logoKanan->setHeight(75);
-    $logoKanan->setOffsetX(90); // Menggeser gambar agar pas di pojok kanan
+    $logoKanan->setOffsetX(30); 
     $logoKanan->setOffsetY(5);
     $logoKanan->setWorksheet($sheet);
 }
 
-// ==========================================
-// JUDUL LAPORAN
-// ==========================================
-$sheet->mergeCells('A6:G6');
+$sheet->mergeCells('A6:J6');
 $sheet->setCellValue('A6', 'LAPORAN REKAPITULASI DATA KUNJUNGAN BUKU TAMU');
 $sheet->getStyle('A6')->getFont()->setBold(true)->setSize(12)->setUnderline(true);
 $sheet->getStyle('A6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-$sheet->mergeCells('A7:G7');
+$sheet->mergeCells('A7:J7');
 $sheet->setCellValue('A7', 'Periode: ' . $periode);
 $sheet->getStyle('A7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-// ==========================================
-// HEADER TABEL
-// ==========================================
 $row = 9;
 $sheet->setCellValue('A'.$row, 'NO');
 $sheet->setCellValue('B'.$row, 'WAKTU KUNJUNGAN');
-$sheet->setCellValue('C'.$row, 'NAMA PEMOHON / TAMU');
-$sheet->setCellValue('D'.$row, 'INSTANSI / ASAL');
-$sheet->setCellValue('E'.$row, 'KONTAK (WA)');
-$sheet->setCellValue('F'.$row, 'RINCIAN KEPERLUAN');
-$sheet->setCellValue('G'.$row, 'BERTEMU DENGAN');
+$sheet->setCellValue('C'.$row, 'NAMA TAMU');
+$sheet->setCellValue('D'.$row, 'ASAL');
+$sheet->setCellValue('E'.$row, 'ALAMAT');
+$sheet->setCellValue('F'.$row, 'KONTAK (WA)');
+$sheet->setCellValue('G'.$row, 'KATEGORI');
+$sheet->setCellValue('H'.$row, 'RINCIAN KEPERLUAN');
+$sheet->setCellValue('I'.$row, 'BERTEMU DENGAN');
+$sheet->setCellValue('J'.$row, 'FOTO');
 
 $headerStyle = [
     'font' => ['bold' => true, 'name' => 'Arial', 'size' => 11],
@@ -168,52 +147,64 @@ $headerStyle = [
         'vertical' => Alignment::VERTICAL_CENTER,
     ],
     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2EFDA']] // Warna Hijau Lembut
+    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2EFDA']] 
 ];
-$sheet->getStyle('A'.$row.':G'.$row)->applyFromArray($headerStyle);
+$sheet->getStyle('A'.$row.':J'.$row)->applyFromArray($headerStyle);
 
-// ==========================================
-// ISI DATA TABEL
-// ==========================================
 $row++;
 $startDataRow = $row;
+
 if ($result && $result->num_rows > 0) {
     $no = 1;
     while ($data = $result->fetch_assoc()) {
         $waktu = date('d/m/Y - H:i', strtotime($data['waktu_masuk'])) . ' WITA';
+        $kategori = !empty($data['kategori']) ? $data['kategori'] : 'Umum / Lainnya';
+        $alamat = !empty($data['alamat']) ? $data['alamat'] : '-';
         
+        $sheet->getRowDimension($row)->setRowHeight(55);
+
         $sheet->setCellValue('A'.$row, $no++);
         $sheet->setCellValue('B'.$row, $waktu);
         $sheet->setCellValue('C'.$row, $data['nama_lengkap']);
         $sheet->setCellValue('D'.$row, $data['instansi']);
-        // Gunakan setCellValueExplicit agar angka 0 di depan No HP tidak hilang
-        $sheet->setCellValueExplicit('E'.$row, $data['no_telepon'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-        $sheet->setCellValue('F'.$row, $data['keperluan']);
-        $sheet->setCellValue('G'.$row, $data['bertemu_dengan']);
+        $sheet->setCellValue('E'.$row, $alamat);
+        $sheet->setCellValueExplicit('F'.$row, $data['no_telepon'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+        $sheet->setCellValue('G'.$row, $kategori);
+        $sheet->setCellValue('H'.$row, $data['keperluan']);
+        $sheet->setCellValue('I'.$row, $data['bertemu_dengan']);
 
-        // Rapikan Teks agar Top-Aligned dan Center untuk kolom tertentu
+        if (!empty($data['foto']) && file_exists('../assets/uploads/' . $data['foto'])) {
+            $fotoTamu = new Drawing();
+            $fotoTamu->setName('Foto Tamu');
+            $fotoTamu->setPath('../assets/uploads/' . $data['foto']);
+            $fotoTamu->setCoordinates('J'.$row);
+            $fotoTamu->setHeight(65); 
+            $fotoTamu->setOffsetX(10); 
+            $fotoTamu->setOffsetY(5);  
+            $fotoTamu->setWorksheet($sheet);
+        } else {
+            $sheet->setCellValue('J'.$row, 'No Photo');
+        }
+
         $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('E'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('G'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('J'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         
         $row++;
     }
 } else {
-    $sheet->mergeCells('A'.$row.':G'.$row);
+    $sheet->mergeCells('A'.$row.':J'.$row);
     $sheet->setCellValue('A'.$row, 'TIDAK ADA DATA KUNJUNGAN PADA PERIODE INI');
     $sheet->getStyle('A'.$row)->getFont()->setBold(true);
     $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
     $row++;
 }
 
-// Beri Border pada seluruh tabel data
-$sheet->getStyle('A'.$startDataRow.':G'.($row-1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-$sheet->getStyle('A'.$startDataRow.':G'.($row-1))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+$sheet->getStyle('A'.$startDataRow.':J'.($row-1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+$sheet->getStyle('A'.$startDataRow.':J'.($row-1))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
 
-// ==========================================
-// AREA TANDA TANGAN
-// ==========================================
 $row += 2;
 $bulan_indo = array(
     '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
@@ -222,27 +213,23 @@ $bulan_indo = array(
 );
 $tanggal_cetak = date('d') . ' ' . $bulan_indo[date('m')] . ' ' . date('Y');
 
-$sheet->mergeCells('F'.$row.':G'.$row);
-$sheet->setCellValue('F'.$row, 'Banjarmasin, ' . $tanggal_cetak);
-$sheet->getStyle('F'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-$sheet->getStyle('F'.$row)->getFont()->setName('Times New Roman')->setSize(11);
+$sheet->mergeCells('I'.$row.':J'.$row);
+$sheet->setCellValue('I'.$row, 'Banjarmasin, ' . $tanggal_cetak);
+$sheet->getStyle('I'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->getStyle('I'.$row)->getFont()->setName('Times New Roman')->setSize(11);
 
 $row++;
-$sheet->mergeCells('F'.$row.':G'.$row);
-$sheet->setCellValue('F'.$row, 'PPID BKK Kelas I Banjarmasin');
-$sheet->getStyle('F'.$row)->getFont()->setBold(true)->setName('Times New Roman')->setSize(11);
-$sheet->getStyle('F'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->mergeCells('I'.$row.':J'.$row);
+$sheet->setCellValue('I'.$row, 'PPID BKK Kelas I Banjarmasin');
+$sheet->getStyle('I'.$row)->getFont()->setBold(true)->setName('Times New Roman')->setSize(11);
+$sheet->getStyle('I'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-// Ruang Kosong TTD
 $row += 4;
-$sheet->mergeCells('F'.$row.':G'.$row);
-$sheet->setCellValue('F'.$row, 'Tim Pelayanan Informasi Publik');
-$sheet->getStyle('F'.$row)->getFont()->setBold(true)->setUnderline(true)->setName('Times New Roman')->setSize(11);
-$sheet->getStyle('F'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->mergeCells('I'.$row.':J'.$row);
+$sheet->setCellValue('I'.$row, 'Tim Pelayanan Informasi Publik');
+$sheet->getStyle('I'.$row)->getFont()->setBold(true)->setUnderline(true)->setName('Times New Roman')->setSize(11);
+$sheet->getStyle('I'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-// ==========================================
-// OUTPUT KE BROWSER SEBAGAI FILE EXCEL
-// ==========================================
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename="' . $nama_file . '"');
 header('Cache-Control: max-age=0');

@@ -66,14 +66,20 @@
                     </div>
 
                     <div class="input-group">
-                        <label>Instansi / Perusahaan *</label>
-                        <input type="text" name="instansi" id="input_instansi" placeholder="Ketik nama instansi" required>
+                        <label>Asal (Instansi , Perorangan , Perusahaan) *</label>
+                        <input type="text" name="instansi" id="input_instansi" placeholder="Nama instansi atau perorangan atau perusahaan" required>
                     </div>
 
-                    <!-- Kategori (Pilihan Dropdown) -->
+                    <!-- KOLOM BARU: Alamat -->
+                    <div class="input-group">
+                        <label>Alamat *</label>
+                        <input type="text" name="alamat" id="input_alamat" placeholder="Ketik alamat lengkap Anda" required>
+                    </div>
+
+                    <!-- Kategori Kunjungan & Input Manual "Lainnya" -->
                     <div class="input-group">
                         <label>Kategori Kunjungan *</label>
-                        <select name="kategori" id="input_kategori" class="form-input-custom" required>
+                        <select id="input_kategori" class="form-input-custom" onchange="aturKategori()" required>
                             <option value="" disabled selected>-- Pilih Kategori Kunjungan --</option>
                             <option value="Pelayanan vaksinasi">1. Pelayanan vaksinasi</option>
                             <option value="Pemeriksaan alat angkut">2. Pemeriksaan alat angkut (Dokumen Kekarantinaan)</option>
@@ -81,11 +87,16 @@
                             <option value="Pertemuan">4. Pertemuan</option>
                             <option value="Keperluan dinas">5. Keperluan dinas</option>
                             <option value="Permohonan SKLT">6. Permohonan SKLT</option>
-                            <option value="Lainnya">7. Lainnya</option>
+                            <option value="Lainnya">7. Lainnya (Ketik Manual)</option>
                         </select>
+                        
+                        <!-- Muncul otomatis jika pilih Lainnya -->
+                        <input type="text" id="input_kategori_lainnya" class="form-input-custom" placeholder="Ketik Kategori Anda secara manual..." style="display:none; margin-top:10px;">
+                        
+                        <!-- Value yang benar-benar akan dikirim ke database -->
+                        <input type="hidden" name="kategori" id="final_kategori">
                     </div>
 
-                    <!-- Keperluan (Ketik Manual) -->
                     <div class="input-group">
                         <label>Rincian Keperluan *</label>
                         <input type="text" name="keperluan" id="input_keperluan" placeholder="Ketik detail keperluan spesifik Anda" required>
@@ -114,7 +125,7 @@
             </div>
 
             <div class="form-footer">
-                <div class="tips-box">💡 <span>Tips: Cukup masukkan nomor WA, data Nama dan Instansi Anda akan terisi otomatis jika pernah berkunjung sebelumnya.</span></div>
+                <div class="tips-box">💡 <span>Tips: Cukup masukkan nomor WA, data Anda (Nama, Instansi, Alamat) akan terisi otomatis jika pernah berkunjung.</span></div>
                 <button type="submit" class="btn-success" id="btnSimpan">✓ SIMPAN DATA</button>
             </div>
         </form>
@@ -124,7 +135,22 @@
     <script src="assets/js/camera.js"></script>
 
     <script>
-        // Fitur Pencarian Data Tamu Otomatis (Autofill)
+        // 1. Logika Kategori (Menampilkan Input Manual)
+        function aturKategori() {
+            let kategori = document.getElementById('input_kategori').value;
+            let lainnya = document.getElementById('input_kategori_lainnya');
+            
+            if (kategori === 'Lainnya') {
+                lainnya.style.display = 'block';
+                lainnya.setAttribute('required', 'required'); // Wajib diisi jika pilih lainnya
+            } else {
+                lainnya.style.display = 'none';
+                lainnya.removeAttribute('required');
+                lainnya.value = ''; // Reset
+            }
+        }
+
+        // 2. Fitur Autofill (Sekarang Mengisi Nama, Instansi, dan Alamat)
         let timeoutId;
         function cekDataTamu(nomor) {
             clearTimeout(timeoutId);
@@ -136,6 +162,7 @@
                         if (data.found) {
                             document.getElementById('input_nama').value = data.nama;
                             document.getElementById('input_instansi').value = data.instansi;
+                            document.getElementById('input_alamat').value = data.alamat; // Auto-fill Alamat
                             document.getElementById('status_autofill').style.display = 'block';
                         } else {
                             document.getElementById('status_autofill').style.display = 'none';
@@ -147,10 +174,14 @@
             }, 600); 
         }
 
-        // Validasi Form Cerdas
+        // 3. Validasi Form Cerdas
         document.getElementById('formKunjungan').addEventListener('submit', function(event) {
             
             let selKategori = document.getElementById('input_kategori');
+            let selLain = document.getElementById('input_kategori_lainnya');
+            let finalKategori = document.getElementById('final_kategori');
+
+            // Cek jika kategori belum dipilih
             if(selKategori.value === '') {
                 event.preventDefault();
                 selKategori.focus();
@@ -158,10 +189,25 @@
                 return;
             }
 
+            // Menyimpan Kategori yang dipilih/diketik ke Input Hidden
+            if (selKategori.value === 'Lainnya') {
+                if (selLain.value.trim() === '') {
+                    event.preventDefault();
+                    selLain.focus();
+                    alert('Mohon ketikkan Kategori Kunjungan Anda secara manual!');
+                    return;
+                }
+                finalKategori.value = selLain.value; // Jika 'Lainnya', simpan yang diketik manual
+            } else {
+                finalKategori.value = selKategori.value; // Jika selain 'Lainnya', simpan pilihan default
+            }
+
+            // Pengecekan Kolom Input Teks lainnya (Termasuk Alamat)
             const fields = [
                 { id: 'input_telepon', namaKolom: 'No. Telepon / WhatsApp' },
                 { id: 'input_nama', namaKolom: 'Nama Lengkap' },
                 { id: 'input_instansi', namaKolom: 'Instansi / Perusahaan' },
+                { id: 'input_alamat', namaKolom: 'Alamat' },
                 { id: 'input_keperluan', namaKolom: 'Rincian Keperluan' },
                 { id: 'input_bertemu', namaKolom: 'Bertemu Dengan' }
             ];
