@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ==========================================
         // KIRIM PESAN OTOMATIS VIA FONNTE API
         // ==========================================
-        $token_fonnte = 'Nm54Nt1seRQkENXw76pP'; 
+        $token_fonnte = 'hYJytUKE8ixvymnDzm9A'; 
 
         $pesan_wa = "Halo, Yth. *Bapak/Ibu {$nama_lengkap}* 👋\n\n" .
                     "Kami mengucapkan terima kasih atas kunjungan Anda ke kantor *Balai Kekarantinaan Kesehatan (BKK) Kelas I Banjarmasin* pada hari ini.\n\n" .

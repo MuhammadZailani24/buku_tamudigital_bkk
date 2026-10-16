@@ -15,7 +15,6 @@ if (isset($_POST['hapus_semua'])) {
     
     // Validasi Keamanan PIN Server-Side
     if ($pin_input === '092367') {
-        // Hapus data dan reset ID menggunakan TRUNCATE
         if ($conn->query("TRUNCATE TABLE kunjungan")) {
             echo "<script>alert('BERHASIL! Seluruh data kunjungan telah dihapus permanen dari sistem.'); window.location.href='kunjungan.php';</script>";
         } else {
@@ -53,15 +52,16 @@ $q_tabel = $conn->query("SELECT * FROM kunjungan ORDER BY waktu_masuk DESC");
             <table>
                 <thead>
                     <tr>
-                        <th width="4%" style="text-align: center;">No.</th>
+                        <th width="3%" style="text-align: center;">No.</th>
                         <th width="10%">Waktu</th>
                         <th width="13%">Nama Tamu</th>
-                        <th width="12%">Asal</th>
-                        <th width="13%">Alamat</th>
-                        <th width="14%">Kategori Kunjungan</th>
-                        <th width="14%">Rincian Keperluan</th>
-                        <th width="12%">Bertemu Dengan</th>
-                        <th width="8%" style="text-align: center;">Foto</th>
+                        <th width="11%">Asal/Instansi</th>
+                        <th width="12%">Alamat</th>
+                        <th width="11%">No. WA</th>
+                        <th width="12%">Kategori</th>
+                        <th width="12%">Rincian Keperluan</th>
+                        <th width="10%">Bertemu</th>
+                        <th width="6%" style="text-align: center;">Foto</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,6 +71,7 @@ $q_tabel = $conn->query("SELECT * FROM kunjungan ORDER BY waktu_masuk DESC");
                         while ($row = $q_tabel->fetch_assoc()) { 
                             $kategori = !empty($row['kategori']) ? htmlspecialchars($row['kategori']) : 'Umum / Lainnya';
                             $alamat = !empty($row['alamat']) ? htmlspecialchars($row['alamat']) : '-';
+                            $no_wa = !empty($row['no_telepon']) ? htmlspecialchars($row['no_telepon']) : '-';
                     ?>
                     <tr>
                         <td style="text-align: center; vertical-align: middle;"><?= $no++; ?></td>
@@ -78,6 +79,7 @@ $q_tabel = $conn->query("SELECT * FROM kunjungan ORDER BY waktu_masuk DESC");
                         <td style="vertical-align: middle;"><strong><?= htmlspecialchars($row['nama_lengkap']); ?></strong></td>
                         <td style="vertical-align: middle;"><?= htmlspecialchars($row['instansi']); ?></td>
                         <td style="vertical-align: middle;"><?= $alamat; ?></td>
+                        <td style="vertical-align: middle;"><?= $no_wa; ?></td>
                         
                         <td style="vertical-align: middle;">
                             <span style="background: #F0FDF4; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 11.5px; border: 1px solid #BBF7D0; display: inline-block; font-weight: bold;">
@@ -104,7 +106,7 @@ $q_tabel = $conn->query("SELECT * FROM kunjungan ORDER BY waktu_masuk DESC");
                     <?php 
                         }
                     } else {
-                        echo "<tr><td colspan='9' style='text-align:center; padding: 20px;'>Belum ada riwayat kunjungan.</td></tr>";
+                        echo "<tr><td colspan='10' style='text-align:center; padding: 20px;'>Belum ada riwayat kunjungan.</td></tr>";
                     }
                     ?>
                 </tbody>
@@ -113,7 +115,6 @@ $q_tabel = $conn->query("SELECT * FROM kunjungan ORDER BY waktu_masuk DESC");
     </div>
 </div>
 
-<!-- SCRIPT AUTENTIKASI HAPUS -->
 <script>
 function konfirmasiHapusSemua() {
     let konfirmasi_awal = confirm("PERINGATAN BAHAYA!\n\nApakah Anda YAKIN ingin menghapus SELURUH data kunjungan secara permanen? Data yang dihapus tidak dapat dikembalikan.");
@@ -124,7 +125,6 @@ function konfirmasiHapusSemua() {
         if (pin === null || pin === "") {
             alert("Tindakan dibatalkan.");
         } else if (pin === "092367") {
-            // Jika PIN benar, buat form rahasia untuk mengeksekusi PHP penghapusan
             let form = document.createElement("form");
             form.method = "POST";
             form.action = "";
