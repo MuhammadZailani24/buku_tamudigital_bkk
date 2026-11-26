@@ -1,6 +1,6 @@
 // ==========================================
 // CAMERA.JS
-// Kamera depan - NON MIRROR
+// Kamera depan - NON MIRROR + RING LIGHT & SCREEN FLASH
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -10,8 +10,61 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnAmbilFoto = document.getElementById('btnAmbilFoto');
     const btnUlangFoto = document.getElementById('btnUlangFoto');
     const fotoBase64 = document.getElementById('fotoBase64');
+    const cameraContainer = video.parentElement;
 
     let stream = null;
+
+    // ==========================================
+    // ELEMEN SCREEN FLASH & BADGE INDIKATOR LIGHT
+    // ==========================================
+    const flashOverlay = document.createElement('div');
+    flashOverlay.style.position = 'fixed';
+    flashOverlay.style.inset = '0';
+    flashOverlay.style.backgroundColor = '#FFFFFF';
+    flashOverlay.style.zIndex = '999999';
+    flashOverlay.style.opacity = '0';
+    flashOverlay.style.pointerEvents = 'none';
+    flashOverlay.style.transition = 'opacity 0.12s ease';
+    document.body.appendChild(flashOverlay);
+
+    const lightBadge = document.createElement('div');
+    lightBadge.innerHTML = '💡 Light Aktif';
+    lightBadge.style.position = 'absolute';
+    lightBadge.style.top = '12px';
+    lightBadge.style.left = '12px';
+    lightBadge.style.background = 'rgba(15, 23, 42, 0.75)';
+    lightBadge.style.color = '#FEF08A';
+    lightBadge.style.fontSize = '11px';
+    lightBadge.style.fontWeight = '700';
+    lightBadge.style.padding = '5px 10px';
+    lightBadge.style.borderRadius = '20px';
+    lightBadge.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+    lightBadge.style.zIndex = '10';
+    lightBadge.style.display = 'none';
+
+    if (cameraContainer) {
+        cameraContainer.style.position = 'relative';
+        cameraContainer.appendChild(lightBadge);
+    }
+
+    function nyalakanLight() {
+        if (cameraContainer) {
+            cameraContainer.style.transition = 'all 0.3s ease';
+            cameraContainer.style.border = '6px solid #FFFFFF';
+            cameraContainer.style.boxShadow = '0 0 0 4px #1E293B, 0 0 35px 10px rgba(255, 255, 255, 0.95), inset 0 0 30px rgba(255, 255, 255, 0.85)';
+        }
+        video.style.filter = 'brightness(1.45) contrast(1.10) saturate(1.05)';
+        lightBadge.style.display = 'block';
+    }
+
+    function matikanLight() {
+        if (cameraContainer) {
+            cameraContainer.style.border = '';
+            cameraContainer.style.boxShadow = '';
+        }
+        video.style.filter = 'none';
+        lightBadge.style.display = 'none';
+    }
 
     // ==========================================
     // AKTIFKAN KAMERA
@@ -69,6 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             await video.play();
 
+            // Nyalakan ring light & pencerah saat kamera siap
+            nyalakanLight();
+
         } catch (error) {
 
             console.error('Gagal mengakses kamera:', error);
@@ -90,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ==========================================
-    // AMBIL FOTO
+    // AMBIL FOTO (DENGAN SCREEN FLASH)
     // ==========================================
     btnAmbilFoto.addEventListener('click', function () {
 
@@ -99,48 +155,62 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        btnAmbilFoto.disabled = true;
 
-        const context = canvas.getContext('2d');
+        // Nyalakan kilatan layar putih terang untuk menerangi wajah
+        flashOverlay.style.opacity = '0.96';
 
-        context.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+        // Tunggu 300ms agar sensor kamera menangkap pantulan cahaya layar
+        setTimeout(function () {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
 
-        // ==========================================
-        // NON-MIRROR HASIL FOTO
-        // ==========================================
-        context.save();
+            const context = canvas.getContext('2d');
 
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
+            context.clearRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
 
-        context.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+            // ==========================================
+            // NON-MIRROR HASIL FOTO + EFEK CERAH
+            // ==========================================
+            context.save();
 
-        context.restore();
+            context.filter = 'brightness(1.45) contrast(1.10) saturate(1.05)';
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
 
-        // Tampilkan hasil foto
-        video.style.display = 'none';
-        canvas.style.display = 'block';
+            context.drawImage(
+                video,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
 
-        btnAmbilFoto.style.display = 'none';
-        btnUlangFoto.style.display = 'inline-block';
+            context.restore();
 
-        // Simpan hasil foto ke input hidden
-        fotoBase64.value = canvas.toDataURL(
-            'image/jpeg',
-            0.90
-        );
+            // Matikan flash & ring light setelah foto tertangkap
+            flashOverlay.style.opacity = '0';
+            matikanLight();
+
+            // Tampilkan hasil foto
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+
+            btnAmbilFoto.style.display = 'none';
+            btnAmbilFoto.disabled = false;
+            btnUlangFoto.style.display = 'inline-block';
+
+            // Simpan hasil foto ke input hidden
+            fotoBase64.value = canvas.toDataURL(
+                'image/jpeg',
+                0.90
+            );
+        }, 300);
     });
 
     // ==========================================
@@ -168,6 +238,9 @@ document.addEventListener('DOMContentLoaded', function () {
             'scaleX(-1)',
             'important'
         );
+
+        // Nyalakan kembali light
+        nyalakanLight();
     });
 
     // ==========================================

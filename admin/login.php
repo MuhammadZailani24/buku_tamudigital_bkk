@@ -3,85 +3,74 @@
 session_start();
 require_once '../config/database.php';
 
-// Jika sudah login, langsung arahkan ke index admin
-if (isset($_SESSION['admin_logged_in'])) {
+// Jika sudah login, langsung lempar ke index
+if (isset($_SESSION['admin_username'])) {
     header("Location: index.php");
-    exit();
+    exit;
 }
 
-$error = "";
+$error = '';
 
-// Proses jika tombol login ditekan
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $conn->real_escape_string($_POST['username']);
-    $password =$_POST['password'];
-    
-    // Enkripsi password input ke format MD5 agar cocok dengan isi database
-    $password_md5 = md5($password);
+    $password = md5($_POST['password']); // Enkripsi MD5 sesuai default
 
-    // DIPERBARUI: Mengambil data dari tabel `admin`, bukan `users_admin`
-    $stmt =$conn->prepare("SELECT id, username, password, nama_admin FROM admin WHERE username = ?");
-    $stmt->bind_param("s", $username);$stmt->execute();
-    $result =$stmt->get_result();
+    $query = "SELECT * FROM admin_users WHERE username = '$username' AND password = '$password'";
+    $result = $conn->query($query);
 
-    if ($result->num_rows > 0) {
-        $row =$result->fetch_assoc();
+    if ($result && $result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $_SESSION['admin_username'] = $user['username'];
+        $_SESSION['admin_role']     = $user['role'];
+        $_SESSION['admin_wilker']   = $user['wilker'];
         
-        // DIPERBARUI: Verifikasi menggunakan perbandingan string MD5 langsung
-        if ($password_md5 ===$row['password']) {
-            // Berhasil login
-            $_SESSION['admin_logged_in'] = true;
-            $_SESSION['nama_admin'] =$row['nama_admin'];
-            $_SESSION['username'] =$row['username']; // Wajib ada untuk sinkronisasi menu Pengaturan
-            
-            header("Location: index.php");
-            exit();
-        } else {
-            $error = "Password yang Anda masukkan salah!";
-        }
+        header("Location: index.php");
+        exit;
     } else {
-        $error = "Username tidak ditemukan!";
+        $error = 'Username atau Password salah!';
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - Buku Tamu</title>
-    <link rel="stylesheet" href="../assets/css/style-tamu.css">
+    <title>Login Admin - BKK Banjarmasin</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #F1F5F9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 380px; text-align: center; }
+        .login-box img { width: 90px; margin-bottom: 15px; }
+        .login-box h2 { margin: 0 0 5px; color: #1E3A8A; font-size: 22px; }
+        .login-box p { color: #64748B; font-size: 13px; margin-bottom: 25px; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; color: #334155; font-weight: bold; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #CBD5E1; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .form-group input:focus { outline: none; border-color: #3B82F6; }
+        .btn-login { background: #2563EB; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-login:hover { background: #1D4ED8; }
+        .alert { background: #FEE2E2; color: #B91C1C; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; border: 1px solid #FCA5A5; }
+    </style>
 </head>
-<body style="background-color: #F4F7FA; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-
-    <div class="login-container">
-        <h2>Login Admin</h2>
-
-        <?php if ($error != ""): ?>
-            <div class="alert-error"><?= $error; ?></div>
-        <?php endif; ?>
-
-        <form action="" method="POST">
-            <div class="input-group">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Masukkan username" required autofocus>
-            </div>
-            
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" name="password" placeholder="Masukkan password" required>
-            </div>
-
-            <button type="submit" class="btn-primary" style="width: 100%; max-width: 100%; margin-top: 10px;">
-                MASUK
-            </button>
-        </form>
+<body>
+    <div class="login-box">
+        <img src="../assets/images/logo_bkk.webp" alt="Logo">
+        <h2>LOGIN SISTEM</h2>
+        <p>Buku Tamu Digital BKK Kelas I Banjarmasin</p>
         
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="../index.php" style="color: #64748B; text-decoration: none; font-size: 14px;">← Kembali ke Halaman Tamu</a>
-        </div>
+        <?php if($error != '') echo "<div class='alert'>$error</div>"; ?>
+        
+        <form method="POST" action="">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="Masukkan username admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Masukkan password">
+            </div>
+            <button type="submit" class="btn-login">Masuk ke Dashboard</button>
+        </form>
     </div>
-
 </body>
 </html>

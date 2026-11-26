@@ -2,13 +2,23 @@
 // admin/logout.php
 session_start();
 
-// Hapus semua variabel session
-$_SESSION = array();
+// 1. Simpan nama wilker ke variabel sementara SEBELUM sesi dihancurkan
+$wilker_tujuan = '';
+if (isset($_SESSION['admin_wilker']) && $_SESSION['admin_wilker'] !== 'Semua Wilker') {
+    $wilker_tujuan = $_SESSION['admin_wilker'];
+}
 
-// Hancurkan session
+// 2. Menghapus semua data sesi dengan bersih
+session_unset();
 session_destroy();
 
-// Arahkan kembali ke halaman login
-header("Location: login.php");
-exit();
+// 3. Logika Pengalihan (Redirect)
+if (!empty($wilker_tujuan)) {
+    // Jika yang logout adalah Admin Wilker, kembalikan ke halaman Welcome wilkernya
+    header("Location: ../welcome.php?wilker=" . urlencode($wilker_tujuan));
+} else {
+    // Jika yang logout adalah Super Admin, kembalikan ke Landing Page utama
+    header("Location: ../index.php");
+}
+exit;
 ?>

@@ -1,8 +1,13 @@
 <?php
 // admin/includes/header.php
-session_start();
 
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+// Pastikan session hanya dijalankan jika belum ada session yang aktif
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Gunakan variabel session dari sistem RBAC yang baru
+if (!isset($_SESSION['admin_username'])) {
     header("Location: login.php");
     exit();
 }
@@ -36,12 +41,18 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
                 <li class="<?= (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">
                     <a href="index.php">📊 Dashboard</a>
                 </li>
-                <li><a href="kunjungan.php">📋 Kunjungan</a></li>
+                <li class="<?= (basename($_SERVER['PHP_SELF']) == 'kunjungan.php') ? 'active' : ''; ?>">
+                    <a href="kunjungan.php">📋 Kunjungan</a>
+                </li>
                 <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan.php') ? 'active' : ''; ?>">
                     <a href="laporan.php">📑 Rekap / Laporan</a>
                 </li>
-                <li><a href="pengguna.php">👥 Pengguna</a></li>
-                <li><a href="pengaturan.php">⚙️ Pengaturan</a></li>
+                <li class="<?= (basename($_SERVER['PHP_SELF']) == 'pengguna.php') ? 'active' : ''; ?>">
+                    <a href="pengguna.php">👥 Pengguna</a>
+                </li>
+                <li class="<?= (basename($_SERVER['PHP_SELF']) == 'pengaturan.php') ? 'active' : ''; ?>">
+                    <a href="pengaturan.php">⚙️ Pengaturan</a>
+                </li>
             </ul>
         </div>
 
@@ -66,8 +77,12 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
                     <span>🕒</span> <span id="clockText">Memuat waktu...</span>
                 </div>
 
-                <div class="user-profile">
-                    👤 <?= isset($_SESSION['nama_admin']) ? $_SESSION['nama_admin'] : 'Admin'; ?>
+                <!-- Update Nama Profil dengan Username RBAC & Label Role -->
+                <div class="user-profile" style="display: flex; align-items: center; gap: 8px;">
+                    👤 <?= isset($_SESSION['admin_username']) ? htmlspecialchars($_SESSION['admin_username']) : 'Admin'; ?>
+                    <span style="font-size: 10px; background: #E2E8F0; padding: 3px 6px; border-radius: 4px; color: #475569; font-weight: bold;">
+                        <?= (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'super_admin') ? 'SUPER ADMIN' : 'WILKER'; ?>
+                    </span>
                 </div>
             </div>
         </header>
